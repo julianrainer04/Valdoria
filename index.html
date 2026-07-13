@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#08100f" />
+  <title>Valdoria — Crown of the Seas</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <button class="brand" data-view="realm" aria-label="Zur Reichsübersicht">
+        <span class="brand-mark">V</span>
+        <span><b>VALDORIA</b><small>CROWN OF THE SEAS</small></span>
+      </button>
+      <nav id="main-nav" aria-label="Hauptnavigation"></nav>
+      <div class="top-actions">
+        <button class="treasury-top" data-view="finances" title="Zur königlichen Schatzkammer">
+          <small>STAATSHAUSHALT</small>
+          <b id="treasury-value">146,2 Mio. ₲</b>
+          <span id="treasury-net">verfügbar</span>
+        </button>
+        <div class="season"><span id="date-label">Frühling 1487</span><small id="turn-label">Runde I</small></div>
+        <button class="icon-button" id="save-button" title="Spielstände">⌑</button>
+        <button class="end-turn" id="end-turn">RUNDE BEENDEN <span>›</span></button>
+      </div>
+    </header>
+
+    <main>
+      <section id="view"></section>
+    </main>
+
+    <footer class="command-dock">
+      <div class="advisor-seal">VA</div>
+      <div class="command-copy"><b>KÖNIGLICHER BEFEHL</b><span>Der Staatsrat übersetzt Euren freien Willen in konkrete Maßnahmen.</span></div>
+      <form id="command-form">
+        <input id="command-input" autocomplete="off" list="command-examples" placeholder="z. B. „Weise 5 Mio. dem Handelsfonds zu und senke die Abgaben in Caerhaven.“" />
+        <button type="submit">ERLASSEN</button>
+      </form>
+      <datalist id="command-examples">
+        <option value="Sende eine Gesandtschaft nach Lysara und schließe einen Handelsvertrag mit Ravengar."></option>
+        <option value="Erkläre Eldoria den Krieg und greife Eldoria mit 8.000 Mann an."></option>
+        <option value="Baue den Leuchtturm von Arvenor."></option>
+        <option value="Verbringe einen Abend mit der Königin."></option>
+      </datalist>
+      <div class="command-status" id="command-status"><small>BEREIT</small><span>Mehrere Maßnahmen können in einem Erlass verbunden werden.</span></div>
+      <button class="help-button" id="help-button">?</button>
+    </footer>
+  </div>
+
+  <div class="toast-stack" id="toasts" aria-live="polite"></div>
+  <dialog id="modal"><div id="modal-content"></div></dialog>
+  <script src="game.js"></script>
+</body>
+</html>
