@@ -46,6 +46,6 @@ Danach im Browser `http://localhost:8080` öffnen. Alternativ kann `index.html` 
 
 ## Architektur
 
-Der Prototyp trennt Daten (`REGIONS`, `PROJECTS`, `ADVISORS`), Spielzustand, Simulation, Befehlsparser und Darstellung innerhalb der gut lesbaren `game.js`. Der Zustand ist reines JSON. Dadurch können später TypeScript-Modelle, ein React-Frontend, SQLite, ein externer Sprachmodell-Parser oder Multiplayer-Synchronisierung ergänzt werden, ohne die Spiellogik neu zu entwerfen.
+Der Prototyp trennt Daten (`REGIONS`, `PROJECTS`, `ADVISORS`), Spielzustand, Simulation, Befehlsparser und Darstellung. Der Zustand ist reines JSON. Die größten Inhalts-Pools liegen als eigene, gemeinsam global-scoped `<script>`-Dateien unter `data/` (`life-actions.js`, `scenarios.js`, `petitions.js`, `emergent.js`, `private-incidents.js`), müssen in `index.html` vor `game.js` geladen werden und lassen sich unabhängig erweitern. Bewusst keine ES-Module (`type="module"`), damit `index.html` weiterhin auch direkt per `file://` geöffnet werden kann. Dadurch können später TypeScript-Modelle, ein React-Frontend, SQLite, ein externer Sprachmodell-Parser oder Multiplayer-Synchronisierung ergänzt werden, ohne die Spiellogik neu zu entwerfen.
 
 Alle visuellen Elemente sind CSS- und SVG-basiert. Es werden keine Bildlizenzen benötigt.

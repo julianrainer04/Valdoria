@@ -1,0 +1,101 @@
+/* Szenarien sind zustandsabhängig. Jede Wahl verändert sofort Werte und hinterlässt
+   eine politische Spur, die spätere Runden und Ereignisse beeinflusst. */
+
+const SCENARIOS=[
+ {id:'pirates',title:'Die schwarze Flagge vor Sareth',category:'MARITIME KRISE',text:'Kapitän Vargo hat drei Getreideschiffe genommen. Händler verlangen Schutz, doch die Piraten bieten gegen Gold Ruhe an.',when:s=>s.stats.trade>55,choices:[
+  {id:'hunt',label:'JAGD ERÖFFNEN',hint:'6 Mio. ₲ · Marine +3 · Risiko eines Gegenschlags',apply:s=>{s.reserve-=6000000;s.stats.navy+=3;s.regions.islands.unrest+=6;s.modifiers.piracy=-.03;s.delayed.push({due:s.turn+2,title:'Vargos letzte Zuflucht',text:'Die Piratenjagd vertreibt Vargos Flotte aus den südlichen Routen.',effects:{trade:3,islandsLoyalty:4}})}},
+  {id:'ransom',label:'LÖSEGELD ZAHLEN',hint:'2,5 Mio. ₲ · Handel bleibt sicher · Ansehen −3',apply:s=>{s.reserve-=2500000;s.stats.legitimacy-=3;s.stats.trade+=1;s.modifiers.piracy=.02}},
+  {id:'convoy',label:'HANDELSKONVOIS',hint:'4 Mio. Militärfonds · dauerhaft sichere Routen',apply:s=>{s.militaryFund-=4000000;s.stats.trade+=2;s.armies[1].stance='Patrouille';s.modifiers.piracy=-.05}}
+ ]},
+ {id:'grain',title:'Leere Kornspeicher in Ravengar',category:'VERSORGUNGSKRISE',text:'Eine nasse Ernte treibt die Brotpreise hoch. Die Kriegsfraktion wartet darauf, die Not gegen Valdoria zu wenden.',when:s=>s.regions.ravengar.unrest>20,choices:[
+  {id:'subsidy',label:'BROT SUBVENTIONIEREN',hint:'5 Mio. ₲ · Unruhe −12 · Händlerloyalität −3',apply:s=>{s.reserve-=5000000;s.regions.ravengar.unrest-=12;s.regions.ravengar.loyalty+=8;s.factions.merchants-=3;s.modifiers.welfare=.02}},
+  {id:'market',label:'MARKT ENTSCHEIDEN LASSEN',hint:'Reserve bleibt · Handel +2 · Unruhe +10',apply:s=>{s.stats.trade+=2;s.regions.ravengar.wealth+=2;s.regions.ravengar.unrest+=10;s.stats.stability-=3}},
+  {id:'import',label:'AURELISCHES KORN',hint:'3 Mio. ₲ · Aurelia +8 · Abhängigkeit',apply:s=>{s.reserve-=3000000;s.relations.Aurelia+=8;s.regions.ravengar.unrest-=7;s.modifiers.aurelianDependence=.03}}
+ ]},
+ {id:'nobles',title:'Briefe hinter dem Wandteppich',category:'HOFINTRIGE',text:'Die Meisterin der Schatten legt Beweise vor: Drei Grafen finanzieren eine Kampagne gegen die Zentralgewalt.',when:s=>s.stats.legitimacy<90,choices:[
+  {id:'trial',label:'ÖFFENTLICHER PROZESS',hint:'Autorität +5 · Adel −10 · Unruhe möglich',apply:s=>{s.stats.legitimacy+=5;s.factions.nobles-=10;s.stats.stability-=2;s.modifiers.centralization=.05}},
+  {id:'pardon',label:'BEGNADE UND BINDEN',hint:'Stabilität +4 · Autorität −2 · Adel +7',apply:s=>{s.stats.stability+=4;s.stats.legitimacy-=2;s.factions.nobles+=7;s.modifiers.centralization=-.02}},
+  {id:'shadow',label:'NETZWERK UNTERWANDERN',hint:'2 Mio. ₲ · Geheimdienstprobe · spätere Folge',apply:s=>{s.reserve-=2000000;s.stats.intelligence+=3;s.delayed.push({due:s.turn+2,title:'Das Netz der drei Grafen',text:'Eure Agenten sichern Schuldbücher und erpressen die Verschwörer zur Zusammenarbeit.',effects:{legitimacy:3,intelligence:2,nobles:-4}})}}
+ ]},
+ {id:'refugees',title:'Segel aus dem Norden',category:'GESELLSCHAFT',text:'Nach einem harten Winter bitten zweitausend nordische Familien um Land und Schutz in Valdoria.',when:s=>s.relations.Nordhaven<10,choices:[
+  {id:'welcome',label:'HÄFEN ÖFFNEN',hint:'Bevölkerung + · Stabilität −2 · langfristiger Wohlstand',apply:s=>{s.regions.caerhaven.pop+=20;s.regions.caerhaven.unrest+=5;s.stats.stability-=2;s.delayed.push({due:s.turn+3,title:'Neue Werftenfamilien',text:'Nordische Schiffbauer gründen Werkstätten in Caerhaven.',effects:{wealth:3,navy:2}})}},
+  {id:'settle',label:'IN RAVENGAR ANSIEDELN',hint:'3 Mio. ₲ · Ravengar Loyalität +6',apply:s=>{s.reserve-=3000000;s.regions.ravengar.pop+=20;s.regions.ravengar.loyalty+=6;s.regions.ravengar.unrest+=2}},
+  {id:'refuse',label:'ZURÜCKWEISEN',hint:'Keine Kosten · Stabilität +1 · Lysara −6',apply:s=>{s.stats.stability+=1;s.relations.Lysara-=6;s.stats.legitimacy-=2}}
+ ]},
+ {id:'bankrun',title:'Ein Flüstern im Bankenviertel',category:'FINANZPANIK',text:'Gerüchte über ungedeckte Wechsel lösen Schlangen vor der Bank von Caerhaven aus.',when:s=>s.tradeFund>50000000,choices:[
+  {id:'guarantee',label:'KRONGARANTIE',hint:'10 Mio. ₲ · Handel +4 · Inflation +0,3',apply:s=>{s.reserve-=10000000;s.stats.trade+=4;s.stats.stability+=2;s.inflation+=.3;s.modifiers.bankGuarantee=.04}},
+  {id:'audit',label:'BÜCHER ÖFFNEN',hint:'2 Mio. ₲ · Geheimdienst +2 · kurzfristig Handel −2',apply:s=>{s.reserve-=2000000;s.stats.intelligence+=2;s.stats.trade-=2;s.delayed.push({due:s.turn+2,title:'Die Bilanz ist bereinigt',text:'Die öffentliche Prüfung stellt Vertrauen her und entlarvt zwei korrupte Bankiers.',effects:{trade:5,legitimacy:2}})}},
+  {id:'collapse',label:'BANK FALLEN LASSEN',hint:'Reserve bleibt · Handel −8 · Inflation −0,4',apply:s=>{s.stats.trade-=8;s.stats.stability-=4;s.inflation-=.4;s.factions.merchants-=12}}
+ ]},
+ {id:'expedition',title:'Karten jenseits des Westwinds',category:'ENTDECKUNG',text:'Kartografen haben eine günstige Strömung entdeckt. Eine Expedition könnte neue Inseln, Partner oder Rivalen offenbaren.',when:s=>s.stats.navy>55,choices:[
+  {id:'royal',label:'KÖNIGLICHE EXPEDITION',hint:'4 Mio. ₲ · Wissen +4 · späterer Fund',apply:s=>{s.reserve-=4000000;s.stats.intelligence+=4;s.delayed.push({due:s.turn+2,title:'Die Korallenarchive',text:'Eure Expedition kehrt mit Karten einer vergessenen Inselkette zurück.',effects:{trade:3,legitimacy:2}})}},
+  {id:'charter',label:'KARTENBRIEF AN DIE GILDEN',hint:'1 Mio. ₲ · Handel +3 · Gilden gewinnen Einfluss',apply:s=>{s.reserve-=1000000;s.stats.trade+=3;s.factions.merchants+=6}},
+  {id:'hold',label:'KÜSTEN ZUERST SICHERN',hint:'Marine +2 · Keine Entdeckung',apply:s=>{s.stats.navy+=2;s.regions.caerhaven.garrison+=2}}
+ ]},
+ {id:'succession',title:'Die Frage nach dem Erben',category:'DYNASTIE',text:'Der Hof diskutiert offen, ob Prinz Lucen bereit ist, eines Tages die Krone zu tragen. Jede Antwort prägt seine Zukunft.',when:s=>s.private.heir<72,choices:[
+  {id:'tutor',label:'MEISTER AUS LYSARA',hint:'1,5 Mio. ₲ · Thronreife +10 · Lysara +4',apply:s=>{s.reserve-=1500000;s.private.heir+=10;s.relations.Lysara+=4;s.private.stress+=2}},
+  {id:'command',label:'DIENST IN DER FLOTTE',hint:'Thronreife +6 · Marine +2 · Gesundheitsrisiko',apply:s=>{s.private.heir+=6;s.stats.navy+=2;s.private.health-=2;s.factions.officers+=3}},
+  {id:'shield',label:'VOR DEM HOF SCHÜTZEN',hint:'Stress −4 · Thronreife −2 · Adel −3',apply:s=>{s.private.stress-=4;s.private.heir-=2;s.factions.nobles-=3}}
+ ]},
+ {id:'guilds',title:'Die Charta der sieben Reeder',category:'HANDELSPOLITIK',text:'Die größten Reeder bieten neue Schiffe und Kapital an – im Gegenzug wollen sie Einfluss auf Hafenzölle und Gerichtsbarkeit.',when:s=>s.factions.merchants>45,choices:[
+  {id:'charter',label:'CHARTA ANNEHMEN',hint:'Handel +5 · Gilden +9 · Legitimität −2',apply:s=>{s.stats.trade+=5;s.factions.merchants+=9;s.stats.legitimacy-=2;s.modifiers.guildTax+=.02}},
+  {id:'crown',label:'KRONMONOPOL BEWAHREN',hint:'Reserve +1 Mio. · Gilden −8 · Verwaltung +2',apply:s=>{s.reserve+=1000000;s.factions.merchants-=8;s.stats.intelligence+=2}},
+  {id:'compromise',label:'BEGRENZTE LIZENZEN',hint:'Handel +2 · Stabilität +1 · Gilden +3',apply:s=>{s.stats.trade+=2;s.stats.stability+=1;s.factions.merchants+=3}}
+ ]},
+ {id:'storm',title:'Der Sturm der sieben Glocken',category:'NATUREREIGNIS',text:'Eine gewaltige Sturmflut zerbricht Kais und bedroht Caerhavens untere Viertel.',when:s=>true,choices:[
+  {id:'rebuild',label:'SOFORT WIEDERAUFBAUEN',hint:'8 Mio. ₲ · Infrastruktur +6 · Legitimität +3',apply:s=>{s.reserve-=8000000;s.regions.caerhaven.infrastructure+=6;s.stats.legitimacy+=3;s.buildingFund-=Math.min(s.buildingFund,2000000)}},
+  {id:'guilds',label:'GILDEN VERPFLICHTEN',hint:'3 Mio. ₲ · Händler −7 · Reserve geschont',apply:s=>{s.reserve-=3000000;s.regions.caerhaven.infrastructure+=3;s.factions.merchants-=7;s.modifiers.guildTax=.02}},
+  {id:'navy',label:'MARINE EINSETZEN',hint:'Flottenmoral −5 · Verluste gering',apply:s=>{s.armies[1].morale-=5;s.stats.navy-=2;s.regions.caerhaven.unrest-=4;s.stats.legitimacy+=1}}
+ ]}
+];
+/* Seltene Zwischenfälle erweitern den Rundenrhythmus über Haushalt und Krieg hinaus. */
+SCENARIOS.push(
+ {id:'cityfire',title:'Feuer über dem Seidenviertel',category:'STADTKATASTROPHE',text:'In Caerhaven springt ein Lagerhausbrand von Dach zu Dach. Familien fliehen zum Hafen, während Kaufleute ihre versiegelten Speicher verteidigen.',when:s=>s.turn>2,choices:[
+  {id:'break',label:'BRANDSCHNEISEN SCHLAGEN',intent:'Baumeister reißen bedrohte Häuser kontrolliert ein, damit die Flammen keine Nahrung mehr finden.',apply:s=>{s.reserve-=1800000;s.regions.caerhaven.infrastructure-=2;s.regions.caerhaven.unrest-=3;s.factions.cities+=2}},
+  {id:'stores',label:'SPEICHER ÖFFNEN LASSEN',intent:'Die Händler müssen ihre Höfe für Löschmannschaften, Wasser und die obdachlosen Familien öffnen.',apply:s=>{s.factions.merchants-=5;s.factions.people+=5;s.regions.caerhaven.unrest-=4}},
+  {id:'navy',label:'HAFENKETTEN EINSETZEN',intent:'Marinebesatzungen bilden Löschketten vom Hafen bis in das brennende Viertel.',apply:s=>{s.armies[1].morale-=3;s.stats.navy-=1;s.stats.legitimacy+=2}}]},
+ {id:'silvervein',title:'Silber unter dem Klosterberg',category:'FUNDSACHE',text:'Steinbrecher stoßen bei Straßenarbeiten auf eine ergiebige Silberader. Kloster, Krone und örtliche Familien beanspruchen das Land.',when:s=>s.turn>3,choices:[
+  {id:'crown',label:'ZUR KRONMINE ERKLÄREN',intent:'Das Gebiet wird vermessen, bewacht und als königliche Mine unter direkte Verwaltung gestellt.',apply:s=>{s.reserve+=4500000;s.factions.nobles-=3;s.factions.people-=1;nudge(s,{crown:5})}},
+  {id:'village',label:'DORFGENOSSENSCHAFT GRÜNDEN',intent:'Die Bewohner erhalten gemeinschaftliche Schürfrechte und wählen ihre eigene Minenverwaltung.',apply:s=>{s.factions.people+=5;s.factions.cities+=3;s.regions.falkenkrone.loyalty+=3;nudge(s,{commons:4})}},
+  {id:'abbey',label:'DEM KLOSTER ÜBERLASSEN',intent:'Das Kloster erhält die Mine gegen die Pflicht, Hospiz und Armenküche zu unterhalten.',apply:s=>{s.factions.nobles+=2;s.factions.people+=3;s.stats.stability+=2}}]},
+ {id:'comet',title:'Der rote Stern über Falkenkrone',category:'OMEN & GLAUBE',text:'Drei Nächte lang steht ein roter Schweifstern über dem Palast. Prediger sprechen von Krieg, Gelehrte von einem seltenen Himmelskörper.',when:s=>s.turn>2,choices:[
+  {id:'academy',label:'GELEHRTE ERKLÄREN LASSEN',intent:'Astronomen beobachten den Stern öffentlich und erklären ihre Erkenntnisse vor Hof und Volk.',apply:s=>{s.stats.intelligence+=4;s.factions.cities+=2;s.factions.nobles-=1}},
+  {id:'procession',label:'BUSSPROZESSION ANORDNEN',intent:'Glocken, Gebete und eine öffentliche Prozession sollen die Furcht im Reich beruhigen.',apply:s=>{s.reserve-=500000;s.stats.stability+=2;s.factions.people+=3}},
+  {id:'silence',label:'AM HOF SCHWEIGEN',intent:'Die Krone gibt keine Deutung ab und untersagt ihren Beamten öffentliche Spekulationen.',apply:s=>{s.stats.legitimacy+=1;s.stats.intelligence-=1;s.private.stress+=3}}]},
+ {id:'duel',title:'Blut auf den Stufen des Wintergartens',category:'HOFZWIST',text:'Zwei junge Erben großer Häuser haben sich nach einem Streit duelliert. Einer liegt schwer verletzt, beide Familien verlangen Gerechtigkeit.',when:s=>s.factions.nobles>45&&s.turn>3,choices:[
+  {id:'trial',label:'BEIDE HÄUSER VORLADEN',intent:'Die Familien müssen Zeugen stellen; ein königliches Gericht klärt Schuld und Entschädigung.',apply:s=>{s.stats.legitimacy+=2;s.factions.nobles-=2;s.stats.intelligence+=1}},
+  {id:'reconcile',label:'VERSÖHNUNGSEID ERZWINGEN',intent:'Beide Erben schwören öffentlich Frieden und ihre Familien stiften gemeinsam ein Hospitalbett.',apply:s=>{s.stats.stability+=3;s.factions.nobles+=1;nudge(s,{crown:3})}},
+  {id:'army',label:'ZUM GRENZDIENST SCHICKEN',intent:'Die überlebenden Duellanten werden aus dem Hof entfernt und gemeinsam einer Grenzgarnison zugeteilt.',apply:s=>{s.factions.officers+=3;s.factions.nobles-=3;s.regions.falkenkrone.garrison+=2}}]},
+ {id:'shipwreck',title:'Der Mann ohne Flagge',category:'MEERESGEHEIMNIS',text:'Ein fremder Schiffbrüchiger wird an den Arvenorklippen gefunden. Er kennt Seekarten, spricht aber über seine Herkunft in drei verschiedenen Sprachen.',when:s=>s.turn>4,choices:[
+  {id:'guest',label:'ALS GAST AUFNEHMEN',intent:'Der Fremde erhält ein Zimmer und darf seine Geschichte vor Gelehrten und Seefahrern erzählen.',apply:s=>{s.stats.intelligence+=3;s.private.reputation+=1;s.private.secret+=3}},
+  {id:'question',label:'IM HAFENTURM VERHÖREN',intent:'Hafenwache und Schattenmeisterin prüfen seine Aussagen getrennt und vergleichen jede Einzelheit.',apply:s=>{s.stats.intelligence+=5;s.factions.people-=1;INC(s,'shadow_web')}},
+  {id:'passage',label:'WEITERREISE BEZAHLEN',intent:'Die Krone stattet ihn mit Kleidung und Passage aus, ohne ihn länger festzuhalten.',apply:s=>{s.reserve-=300000;s.relations.Lysara+=2;s.stats.legitimacy+=1}}]},
+ {id:'printing',title:'Die hundert gleichen Seiten',category:'ERFINDUNG',text:'Ein Handwerker zeigt eine Presse, die in einem Tag mehr Seiten druckt als ein Schreiber im Monat. Gilden und Geistliche fürchten ungeprüfte Worte.',when:s=>s.stats.intelligence>45&&s.turn>5,choices:[
+  {id:'license',label:'DRUCKLIZENZEN VERGEBEN',intent:'Werkstätten dürfen drucken, wenn jedes Werk einen namentlichen Herausgeber und ein königliches Siegel trägt.',apply:s=>{s.stats.intelligence+=3;s.factions.cities+=3;s.stats.legitimacy+=1}},
+  {id:'free',label:'FREIEN DRUCK ERLAUBEN',intent:'Jeder darf Texte vervielfältigen und verkaufen, solange gewöhnliche Gesetze eingehalten werden.',apply:s=>{s.factions.cities+=6;s.stats.intelligence+=4;s.stats.stability-=2;nudge(s,{commons:4})}},
+  {id:'crown',label:'NUR DIE KRONDRUCKEREI',intent:'Die Maschinen werden aufgekauft und dürfen ausschließlich für Erlasse, Bücher und Karten der Krone arbeiten.',apply:s=>{s.reserve-=1000000;s.stats.legitimacy+=3;s.stats.intelligence+=2;nudge(s,{crown:5})}}]},
+ {id:'tournament',title:'Das Turnier der sieben Banner',category:'FEST & RIVALITÄT',text:'Zum Jahrestag der Krönung bitten Ritter aus allen Landesteilen um ein großes Turnier. Alte Feindschaften reisen mit ihnen an.',when:s=>s.life.age>=15&&s.turn>4,choices:[
+  {id:'grand',label:'GROSSES TURNIER AUSRUFEN',intent:'Falkenkrone öffnet seine Felder für Wettkämpfe, Marktstände und Gäste aus allen Provinzen.',apply:s=>{s.reserve-=2200000;s.factions.nobles+=4;s.factions.people+=3;s.private.reputation+=3}},
+  {id:'common',label:'AUCH BÜRGER ZULASSEN',intent:'Neben Rittern dürfen Bogenschützen, Ringer und Reiter aus Städten und Dörfern antreten.',apply:s=>{s.factions.people+=5;s.factions.cities+=4;s.factions.nobles-=2}},
+  {id:'cancel',label:'RIVALEN GETRENNT HALTEN',intent:'Das Turnier wird abgesagt; die rivalisierenden Gefolgschaften müssen die Hauptstadt verlassen.',apply:s=>{s.stats.stability+=2;s.factions.nobles-=3;s.private.reputation-=2}}]},
+ {id:'royalportrait',title:'Das unvollendete Porträt',category:'HOF & SELBSTBILD',text:'Der berühmte Maler Corio zeigt den König nicht als Sieger, sondern müde und allein vor einem offenen Fenster. Der Hof ist schockiert.',when:s=>s.life.age>=16,choices:[
+  {id:'display',label:'UNVERÄNDERT AUSSTELLEN',intent:'Das ehrliche Bild wird im öffentlichen Audienzgang aufgehängt und mit dem Namen des Malers versehen.',apply:s=>{s.private.reputation+=4;s.factions.people+=3;s.factions.nobles-=2}},
+  {id:'revise',label:'EIN HERRSCHERBILD VERLANGEN',intent:'Der Maler muss Krone, Mantel und Siegeszeichen ergänzen, bevor das Werk gezeigt wird.',apply:s=>{s.stats.legitimacy+=2;s.private.stress+=2;nudge(s,{crown:3})}},
+  {id:'private',label:'FÜR DIE PRIVATGEMÄCHER KAUFEN',intent:'Das Bild bleibt der Familie vorbehalten und wird nicht Teil der öffentlichen Hofdarstellung.',apply:s=>{s.reserve-=250000;s.private.stress-=4;s.private.reputation+=1}}]},
+ {id:'assassin',title:'Die Nadel im Gebetbuch',category:'ATTENTATSVERSUCH',text:'Eine vergiftete Nadel wird im Gebetbuch des Königs entdeckt. Nur wenige Bedienstete hatten Zugang zum privaten Oratorium.',when:s=>s.turn>7&&s.stats.legitimacy<85,choices:[
+  {id:'quiet',label:'STILL ERMITTELN LASSEN',intent:'Nur die Schattenmeisterin und zwei vertraute Diener verfolgen Zugänge, Einkäufe und Alibis.',apply:s=>{s.stats.intelligence+=5;s.private.secret+=4;s.private.stress+=4}},
+  {id:'purge',label:'DEN PALAST ABRIEGELN',intent:'Tore werden geschlossen, Bedienstete getrennt verhört und alle privaten Räume durchsucht.',apply:s=>{s.stats.stability-=2;s.factions.nobles-=3;s.stats.legitimacy+=2;INC(s,'tyranny')}},
+  {id:'public',label:'DIE NADEL ÖFFENTLICH ZEIGEN',intent:'Die Krone macht den Anschlag bekannt und fordert Zeugen im ganzen Reich auf, Hinweise zu melden.',apply:s=>{s.factions.people+=3;s.stats.legitimacy+=3;s.private.stress+=2}}]},
+ {id:'earthquake',title:'Die Erde unter Maravelle',category:'NATUREREIGNIS',text:'Ein nächtliches Beben beschädigt den Leuchtturm und öffnet Risse in den Zisternen der südlichen Inseln.',when:s=>s.turn>6,choices:[
+  {id:'engineers',label:'KÖNIGLICHE BAUMEISTER SENDEN',intent:'Ingenieure prüfen Fundamente, reparieren Zisternen und sichern den Leuchtturm gegen Nachbeben.',apply:s=>{s.buildingFund=Math.max(0,s.buildingFund-1800000);s.regions.islands.infrastructure+=4;s.regions.islands.loyalty+=3}},
+  {id:'captains',label:'INSELKAPITÄNE VERANTWORTEN LASSEN',intent:'Die örtlichen Kapitäne organisieren Material und Arbeit nach ihren eigenen Regeln.',apply:s=>{s.regions.islands.loyalty+=5;s.stats.legitimacy-=1;nudge(s,{crown:-3})}},
+  {id:'evacuate',label:'BEWOHNER UMSIEDELN',intent:'Gefährdete Familien werden vorübergehend nach Sareth und Caerhaven gebracht.',apply:s=>{s.reserve-=1200000;s.factions.people+=3;s.regions.islands.pop-=5;s.regions.caerhaven.pop+=5}}]},
+ {id:'maskedguest',title:'Die Unbekannte mit der silbernen Maske',category:'HOFGEHEIMNIS',text:'Beim Winterball bittet eine maskierte Frau den König um einen Tanz. Sie kennt ein Geheimnis aus der letzten Nacht seines Vaters.',when:s=>s.life.age>=17&&s.turn>6,choices:[
+  {id:'dance',label:'DEN TANZ ANNEHMEN',intent:'Der König tanzt mit ihr und lässt sie währenddessen erzählen, ohne Wachen hinzuzuziehen.',apply:s=>{s.private.secret+=7;s.life.grief-=3;s.stats.intelligence+=2}},
+  {id:'garden',label:'IM GARTEN SPRECHEN',intent:'Ein vertrauter Diener begleitet beide in den Wintergarten, wo sie ihre Beweise zeigen soll.',apply:s=>{s.stats.intelligence+=4;s.private.stress+=2;s.life.grief-=2}},
+  {id:'guards',label:'DIE WACHE RUFEN',intent:'Die Fremde wird festgehalten, entwaffnet und noch in derselben Nacht befragt.',apply:s=>{s.stats.legitimacy+=1;s.private.secret+=2;s.factions.nobles-=1}}]},
+ {id:'lostpaychest',title:'Die verschwundene Soldkiste',category:'KRIMINALFALL',text:'Eine versiegelte Truhe mit Garnisonssold erreicht Falkenkrone leer. Hauptmann, Schreiber und Fuhrleute beschuldigen einander.',when:s=>s.turn>4,choices:[
+  {id:'audit',label:'DEN WEG REKONSTRUIEREN',intent:'Ermittler prüfen Siegel, Raststätten und Wachlisten jeder Etappe der Reise.',apply:s=>{s.stats.intelligence+=3;s.reserve-=300000;s.factions.officers-=1}},
+  {id:'captain',label:'DEN HAUPTMANN HAFTEN LASSEN',intent:'Der verantwortliche Hauptmann bleibt in Haft, bis er das Geld oder den Täter vorweisen kann.',apply:s=>{s.factions.officers-=4;s.stats.legitimacy+=1;nudge(s,{crown:3})}},
+  {id:'replace',label:'SOLD SOFORT ERSETZEN',intent:'Die Garnison erhält ihr Geld aus der Reserve; die Untersuchung läuft ohne Zahlungsdruck weiter.',apply:s=>{s.reserve-=1500000;s.factions.officers+=4;s.stats.stability+=1}}]}
+);
