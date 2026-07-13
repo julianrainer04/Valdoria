@@ -77,6 +77,20 @@ dialog{padding:0;border:1px solid #6f5d3d;background:#0d1715;color:var(--ink);wi
 .fam-act:disabled:hover{transform:none;background:#141c1a;border-color:#7c653e}
 @media(max-width:1250px){.fam-detail{grid-template-columns:1fr}.fam-actions{grid-template-columns:1fr}}
 
+/* Diplomatie: sichtbarer Status, warum Krieg während der Regentschaft gesperrt ist */
+.regency-banner{display:flex;align-items:center;gap:16px;border:1px solid #8a6d3d;background:linear-gradient(110deg,#231a12,#141d1a);padding:14px 18px;margin:0 0 20px}
+.rb-icon{font-size:26px;color:#e0bf72;flex-shrink:0}
+.rb-body{flex:1;min-width:0}
+.rb-body b{display:block;font-family:Cinzel;font-size:10px;letter-spacing:.08em;color:#ecca8a;margin-bottom:5px}
+.rb-body span{display:block;font-size:11px;line-height:1.6;color:#c2cbc3}
+.rb-body span b{display:inline;font-size:inherit;letter-spacing:0;color:#e0bf72}
+.rb-bar{height:5px;background:#26332f;border-radius:3px;overflow:hidden;margin-top:10px;max-width:320px}
+.rb-bar i{display:block;height:100%;background:linear-gradient(90deg,#80643a,#e0bf72);transition:width .6s}
+.rb-figure{text-align:center;flex-shrink:0;border-left:1px solid #4a5d55;padding-left:16px}
+.rb-figure b{display:block;font-family:Cinzel;font-size:22px;color:#e6dcc7}
+.rb-figure small{display:block;font-size:7px;letter-spacing:.08em;color:#8b978f;margin-top:3px}
+@media(max-width:900px){.regency-banner{flex-direction:column;align-items:flex-start}.rb-figure{border-left:0;padding-left:0}}
+
 /* Reich: Übersicht — was ist zu tun, klare Abschnitte */
 .realm-todo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid #4a5d55;background:#0f1a18;padding:10px 16px;margin:0 0 16px}
 .realm-todo.done{border-color:#4f8b62;background:#101c17}
