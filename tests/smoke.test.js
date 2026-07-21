@@ -18,8 +18,9 @@ const dataFiles = [
   'data/deep-systems.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
+const toolFiles = ['scripts/export-map-guide.js'];
 
-for (const file of scriptFiles) {
+for (const file of [...scriptFiles, ...toolFiles]) {
   assert.doesNotThrow(() => new vm.Script(read(file), { filename: file }), `${file} enthält einen Syntaxfehler`);
 }
 
@@ -111,5 +112,7 @@ assert.doesNotMatch(gameSource, /n\.innerHTML=`<b>\$\{title\}/, 'Toast-Texte wer
 for (const feature of ['rememberDecision', 'regionIdentityPanel', 'characterDynamicsPanel', 'openPeaceConference', 'data-chronicle-filter', 'tutorialPanel']) {
   assert.match(gameSource, new RegExp(feature), `Neues Geschichtssystem fehlt: ${feature}`);
 }
+assert.match(gameSource, /--region-alpha/, 'Gemalte Länder und dynamische Kartenfarben werden nicht gemeinsam dargestellt');
+assert.match(read('style.css'), /assets\/map-painted-atlas\.webp/, 'Der gemalte Grenzatlas ist nicht als Kartenunterlage eingebunden');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
