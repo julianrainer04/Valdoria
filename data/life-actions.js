@@ -2,6 +2,10 @@
    hinter dem Herrscher und schalten spätere Wege statt eines festen Pfads frei. */
 
 const LIFE_ACTIONS=[
+ {id:'young_garden',min:6,max:11,icon:'❀',name:'Im Palastgarten spielen',text:'Zwischen Rosenhecken und Springbrunnen bleibt für kurze Zeit Raum, einfach nur ein Kind zu sein.',apply:s=>{s.private.stress=Math.max(0,s.private.stress-6);s.life.empathy+=3;s.private.health=Math.min(100,s.private.health+2)}},
+ {id:'young_tutor',min:6,max:11,icon:'✎',name:'Beim Hauslehrer büffeln',text:'Buchstaben, Zahlen und die ersten Namen der großen Häuser Valdorias füllen den Vormittag.',apply:s=>{s.life.education+=6;s.stats.stability+=1}},
+ {id:'young_explore',min:6,max:11,icon:'♦',name:'Die Gänge von Falkenkrone erkunden',text:'Hinter unscheinbaren Türen verbergen sich Rüstkammern, Bibliotheken und Geschichten, die kein Erwachsener erzählt.',apply:s=>{s.life.courage+=3;s.stats.intelligence+=1;s.private.stress=Math.max(0,s.private.stress-3)}},
+ {id:'young_watch_court',min:8,max:11,icon:'♜',name:'Vom Balkon aus den Hof beobachten',text:'Von oben wirkt der Staatsrat wie ein Schauspiel — Gesichter, Stimmen und Bündnisse, die sich ein Kind schon zu merken beginnt.',apply:s=>{s.life.authority+=2;s.stats.intelligence+=1}},
  {id:'father_memory',min:12,max:15,icon:'✶',name:'In Vaters Arbeitszimmer gehen',text:'Zwischen Seekarten und seinem letzten Brief entscheidet Ihr, ob Trauer Euch bricht oder antreibt.',apply:s=>{s.life.grief-=11;s.life.courage+=4;s.private.stress-=6;s.stats.legitimacy+=1}},
  {id:'mother_console',min:12,max:17,icon:'♕',name:'Bei der Königinmutter Schutz suchen',text:'Für einen Abend dürft Ihr wieder Sohn statt König sein. Ihre Nähe stärkt Euch, aber auch ihren Einfluss.',apply:s=>{s.life.motherTrust+=8;s.life.grief-=7;s.private.stress-=9;s.factions.nobles+=2;s.life.authority-=1}},
  {id:'study_law',min:12,max:17,icon:'⚖',name:'Recht und Geschichte studieren',text:'Der Kanzler legt alte Urkunden vor. Was Ihr heute versteht, bestimmt später, wer Euch täuschen kann.',apply:s=>{s.life.education+=8;s.life.authority+=3;s.stats.stability+=1;s.private.stress+=3}},
