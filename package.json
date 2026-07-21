@@ -4,7 +4,7 @@
   "private": true,
   "description": "Lokale politische Herrschafts-, Wirtschafts- und Lebenssimulation",
   "scripts": {
-    "test": "node tests/smoke.test.js"
+    "test": "node tests/smoke.test.js && node tests/runtime.test.js"
   },
   "engines": {
     "node": ">=20"

@@ -12,7 +12,8 @@ const dataFiles = [
   'data/scenarios.js',
   'data/petitions.js',
   'data/emergent.js',
-  'data/private-incidents.js'
+  'data/private-incidents.js',
+  'data/depth-systems.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
@@ -69,7 +70,7 @@ const gameSource = read('game.js');
 const saveStart = gameSource.indexOf('const SAVE_VERSION=');
 const saveEnd = gameSource.indexOf('let state=migrateState', saveStart);
 assert.ok(saveStart >= 0 && saveEnd > saveStart, 'Speicherlogik konnte nicht gefunden werden');
-const saveSource = gameSource.slice(saveStart, saveEnd) + '\n;globalThis.__saveApi={SAVE_VERSION,isCompatibleSave,migrateState};';
+const saveSource = read('data/depth-systems.js') + '\n' + gameSource.slice(saveStart, saveEnd) + '\n;globalThis.__saveApi={SAVE_VERSION,isCompatibleSave,migrateState};';
 const saveContext = {
   structuredClone,
   REGIONS: {
@@ -97,6 +98,10 @@ assert.equal(migrated.life.age, 22, 'Alter ging bei der Migration verloren');
 assert.equal(Array.isArray(migrated.life.children), true, 'Fehlende Lebensfelder wurden nicht ergänzt');
 assert.equal(migrated.life.children.length, 0, 'Neue Kinderliste muss bei alten Spielständen leer beginnen');
 assert.equal(migrated.private.stress, 73, 'Privatwerte gingen bei der Migration verloren');
+assert.equal(migrated.depth.court.length, 8, 'Der lebendige Hof wurde bei der Migration nicht ergänzt');
+assert.equal(Object.keys(migrated.depth.world).length, 5, 'Autonome Nachbarreiche fehlen im migrierten Spielstand');
+assert.equal(Object.keys(migrated.depth.economy.goods).length, 7, 'Warenwirtschaft fehlt im migrierten Spielstand');
+assert.equal(Array.isArray(migrated.depth.innovation.unlocked), true, 'Forschungsfortschritt ist nicht speicherbar');
 assert.equal(migrated.regions.caerhaven.loyalty, 44, 'Regionenfortschritt ging bei der Migration verloren');
 assert.equal(migrated.regions.caerhaven.name, 'Caerhaven', 'Fehlende Regionsdaten wurden nicht ergänzt');
 
@@ -105,5 +110,8 @@ assert.doesNotMatch(gameSource, /n\.innerHTML=`<b>\$\{title\}/, 'Toast-Texte wer
 assert.match(gameSource, /REGION_RENDER_SHAPES/, 'Die Kartenpolygone werden nicht zu sauberen Grenzen geglättet');
 assert.match(gameSource, /assets\/map-painted-atlas-v2\.webp/, 'Der exakt ausgeschnittene Grenzatlas ist nicht eingebunden');
 assert.match(gameSource, /vector-territories/, 'Länderbild und interaktive Spielflächen sind nicht verbunden');
+assert.match(gameSource, /depthSystemsTurn\(\)/, 'Die tiefen Systeme laufen beim Rundenwechsel nicht mit');
+assert.match(gameSource, /warLogisticsPanel/, 'Kriegslogistik ist nicht in die Länderkarte eingebunden');
+assert.match(gameSource, /goodsMarketPanel/, 'Die Warenwirtschaft fehlt im Finanzbereich');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
