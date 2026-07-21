@@ -9,7 +9,7 @@ const dataFiles=['life-actions','scenarios','petitions','emergent','private-inci
 let source=dataFiles.map(file=>fs.readFileSync(path.join(root,'data',file+'.js'),'utf8')).join('\n')+'\n'+fs.readFileSync(path.join(root,'game.js'),'utf8');
 const uiBindings=source.indexOf("document.addEventListener('click',e=>{let b=e.target.closest('[data-view]')");
 assert.ok(uiBindings>0,'Start der Browser-Bindungen wurde nicht gefunden');
-source=source.slice(0,uiBindings)+`\nrender=function(){};persist=function(){};toast=function(){};flashDeltas=function(){};globalThis.__api={state,recordDecision,regionIdentityAction,characterPolicy,livingHistoryYearTick,settlePeace,peaceTermAvailable,realmView,privateView,chronicleView,diplomacyView,openPeaceConference,ensureDeepState,officePanel,appointOffice,governorPanel,appointGovernor,setGovernorStyle,applyOfficeAndLawRound,lawPanel,enactLaw,updateCoalition,coalitionPanel,resolveCoalition,economyPanel,advanceEconomy,investIndustry,startIntelOperation,advanceIntelOperations,intelligenceOperationsPanel,prepareDeepBattle,warPlanningPanel,processProjectRound,applyDeepProjectCompletion,openProjectPlanning,projectStrategyPanel,dynastyEducationPanel,setEducation,advanceDynastyEducation,advanceDeepSystems};`;
+source=source.slice(0,uiBindings)+`\nrender=function(){};persist=function(){};toast=function(){};flashDeltas=function(){};globalThis.__api={state,recordDecision,regionIdentityAction,characterPolicy,livingHistoryYearTick,settlePeace,peaceTermAvailable,realmView,privateView,chronicleView,diplomacyView,openPeaceConference,mapSvg,ensureDeepState,officePanel,appointOffice,governorPanel,appointGovernor,setGovernorStyle,applyOfficeAndLawRound,lawPanel,enactLaw,updateCoalition,coalitionPanel,resolveCoalition,economyPanel,advanceEconomy,investIndustry,startIntelOperation,advanceIntelOperations,intelligenceOperationsPanel,prepareDeepBattle,warPlanningPanel,processProjectRound,applyDeepProjectCompletion,openProjectPlanning,projectStrategyPanel,dynastyEducationPanel,setEducation,advanceDynastyEducation,advanceDeepSystems};`;
 const element={innerHTML:'',close(){},showModal(){},classList:{add(){},remove(){}},querySelector(){return element},querySelectorAll(){return[]}};
 const context={structuredClone,Intl,console,Math,Date,localStorage:{getItem(){return null},setItem(){},removeItem(){}},document:{querySelector(){return element},querySelectorAll(){return[]}},window:{scrollTo(){}},requestAnimationFrame(fn){fn()},setTimeout(){}};
 vm.runInNewContext(source,context,{filename:'valdoria-system.js'});
@@ -18,6 +18,10 @@ api.ensureDeepState();
 assert.match(api.realmView(),/REGIONALE IDENTITÄT/,'Reichsansicht zeigt die Identität des ausgewählten Gebiets nicht');
 assert.match(api.privateView(),/MENSCHEN MIT EIGENEM WILLEN/,'Privatleben rendert die eigenständigen Figuren nicht');
 assert.match(api.chronicleView(),/WIRKUNGSKETTEN/,'Chronik rendert keine Ursachenketten');
+const initialMap=api.mapSvg();
+assert.equal((initialMap.match(/data-territory=/g)||[]).length,8,'Vektorkarte besitzt nicht für jede Region eine eigene Fläche');
+assert.doesNotMatch(initialMap,/<image\s/i,'Karte hängt weiterhin von einem nicht exakt färbbaren Hintergrundbild ab');
+for(const id of ['caerhaven','falkenkrone','nordhaven','ravengar','eldoria','aurelia','lysara','islands'])assert.match(initialMap,new RegExp(`data-territory="${id}"`),`Kartenfläche für ${id} fehlt`);
 
 api.recordDecision('Schutzversprechen an Ravengar','Die Krone garantiert die örtliche Charta.',{kind:'region',target:'Ravengar',region:'ravengar'});
 assert.equal(state.memories[0].type,'Versprechen','Konkrete Zusagen werden nicht als Erinnerung erkannt');
@@ -38,6 +42,7 @@ api.livingHistoryYearTick();
 assert.ok(state.events.length>=eventCount+1,'Figuren und Regionen entwickeln sich im Jahreswechsel nicht selbst weiter');
 
 state.life.regency=false;state.diplo.Ravengar={war:true,campaign:{startedTurn:1,initialEnemy:12000}};state.countryPolicy={Ravengar:{occupied:true}};state.regions.ravengar.garrison=0;
+assert.match(api.mapSvg(),/class="vector-region occupied [^"]*" data-region="ravengar"/,'Besetztes Land wird nicht auf seiner exakten Vektorfläche blau dargestellt');
 assert.equal(api.peaceTermAvailable('Ravengar','ravengar','annex'),true,'Vollständig besetztes Land kann nicht in der Friedenskonferenz einverleibt werden');
 assert.doesNotThrow(()=>api.openPeaceConference('ravengar'),'Friedenskonferenz kann aus der Länderansicht nicht geöffnet werden');
 assert.match(element.innerHTML,/LAND EINVERLEIBEN/,'Friedenskonferenz zeigt die möglichen Vertragsziele nicht');
@@ -46,6 +51,7 @@ assert.equal(state.regions.ravengar.realm,'Valdoria','Einverleibung überträgt 
 assert.equal(state.diplo.Ravengar.war,false,'Krieg endet nach der Friedenskonferenz nicht');
 assert.equal(state.countryPolicy.Ravengar.annexed,true,'Einverleibte Bevölkerung und Einnahmen werden nicht aktiviert');
 assert.equal(state.peaceHistory[0].term,'annex','Friedensvertrag fehlt in der dauerhaften Geschichte');
+assert.match(api.mapSvg(),/class="vector-region annexed [^"]*" data-region="ravengar"/,'Einverleibtes Land erhält nicht dauerhaft Königsblau');
 
 assert.match(api.officePanel(),/ÄMTER DER KRONE/,'Ämterverwaltung kann nicht gerendert werden');
 api.appointOffice('treasurer:advisor:2');
