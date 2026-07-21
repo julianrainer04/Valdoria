@@ -12,7 +12,8 @@ const dataFiles = [
   'data/scenarios.js',
   'data/petitions.js',
   'data/emergent.js',
-  'data/private-incidents.js'
+  'data/private-incidents.js',
+  'data/living-history.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
@@ -34,16 +35,19 @@ const poolSource = dataFiles.map(read).join('\n') + `
   scenarios:SCENARIOS,
   petitions:PETITIONS,
   emergent:EMERGENT_TEMPLATES,
-  privateIncidents:PRIVATE_INCIDENTS
+  privateIncidents:PRIVATE_INCIDENTS,
+  regions:Object.values(REGION_IDENTITIES),
+  peaceTerms:Object.values(PEACE_TERMS),
+  tutorials:Object.values(TUTORIAL_STEPS)
 };`;
 const poolContext = {};
 vm.runInNewContext(poolSource, poolContext, { filename: 'content-pools.js' });
 
-const expectedMinimums = { life: 20, scenarios: 21, petitions: 26, emergent: 12, privateIncidents: 27 };
+const expectedMinimums = { life: 20, scenarios: 21, petitions: 26, emergent: 12, privateIncidents: 27, regions: 8, peaceTerms: 6, tutorials: 8 };
 for (const [name, minimum] of Object.entries(expectedMinimums)) {
   const entries = poolContext.__pools[name];
   assert.ok(entries.length >= minimum, `${name} enthält nur ${entries.length} statt mindestens ${minimum} Einträge`);
-  const ids = entries.map(entry => entry.id);
+  const ids = entries.map(entry => entry.id).filter(Boolean);
   assert.equal(new Set(ids).size, ids.length, `${name} enthält doppelte IDs`);
   for (const entry of entries) {
     if (!entry.choices) continue;
@@ -102,5 +106,8 @@ assert.equal(migrated.regions.caerhaven.name, 'Caerhaven', 'Fehlende Regionsdate
 
 assert.match(gameSource, /escapeHtml\(h\.raw\)/, 'Freie Befehle werden in der Historie nicht sicher maskiert');
 assert.doesNotMatch(gameSource, /n\.innerHTML=`<b>\$\{title\}/, 'Toast-Texte werden noch als ungeprüftes HTML eingesetzt');
+for (const feature of ['rememberDecision', 'regionIdentityPanel', 'characterDynamicsPanel', 'openPeaceConference', 'data-chronicle-filter', 'tutorialPanel']) {
+  assert.match(gameSource, new RegExp(feature), `Neues Geschichtssystem fehlt: ${feature}`);
+}
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
