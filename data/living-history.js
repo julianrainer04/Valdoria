@@ -30,11 +30,11 @@ const PEACE_TERMS={
 
 const TUTORIAL_STEPS={
  realm:{title:'Die Karte ist Euer wichtigstes Werkzeug',text:'Wählt ein Land oder Kronland. Rechts erscheinen Lage, Geschichte und alle möglichen Befehle. Offene Pflichtentscheidungen stehen unter der Karte.'},
- finances:{title:'Gold ist in Reserve und Zweckfonds getrennt',text:'Die Staatsreserve ist sofort verfügbar. Zweckfonds binden Mittel für Handel, Militär, Bauten, Diplomatie oder Krisen.'},
- council:{title:'Jeder Rat besitzt eigene Interessen',text:'Minister helfen, erinnern sich aber an Nähe, Zurückweisung und Macht. Pro Runde kann jeder Berater nur einmal wirksam eingesetzt werden.'},
- military:{title:'Heere brauchen Geld, Moral und Zeit',text:'Haltung, Stärke und Nachschub entscheiden gemeinsam. Der Kriegsbericht zeigt Frontverlauf und bekannte Feindstärke.'},
- diplomacy:{title:'Ein Auftrag braucht Ziel und Vorgehen',text:'Gesandtschaften sind keine automatischen Boni: Wählt erst das konkrete Ziel und danach Auftreten und Einsatz.'},
- projects:{title:'Bauwerke verändern Regionen dauerhaft',text:'Bauten benötigen mehrere Runden. Nach der Vollendung beeinflussen sie Finanzen, Menschen, Politik und private Möglichkeiten.'},
- private:{title:'Familie und Freunde handeln auch selbst',text:'Wählt eine Person, lernt ihre Hoffnung und Furcht kennen und entscheidet, wie viel Nähe, Ehre oder Aufsicht Ihr ihr gebt.'},
+ finances:{title:'Gold allein ernährt noch kein Reich',text:'Reserve und Zweckfonds finanzieren Vorhaben. Regionen erzeugen konkrete Waren; Vorräte, Preise, Engpässe, Handelswege und Investitionen bestimmen, was Valdoria wirklich leisten kann.'},
+ council:{title:'Regieren heißt Macht verteilen',text:'Besetzt Ämter, erlasst Gesetze und verhandelt mit Hofgruppen. Kompetenz schafft Wirkung – Loyalität und Eigeninteressen entscheiden über den politischen Preis.'},
+ military:{title:'Heere brauchen einen wirklichen Feldzugsplan',text:'Legt Kriegsziel, Taktik und Befehlshaber fest. Truppen verbrauchen Getreide und Eisen; Gelände, Jahreszeit, Moral, Versorgung und Aufklärung verändern den Verlauf.'},
+ diplomacy:{title:'Wissen ist nie vollständig',text:'Fremde Truppen und Vermögen erscheinen als Schätzungen. Gesandtschaften und mehrstufige Geheimoperationen verbessern Quellen, können scheitern oder als Täuschung zurückschlagen.'},
+ projects:{title:'Jedes Bauwerk ist eine politische Entscheidung',text:'Wählt Standort, Ausführung, Baumeister und Finanzierung. Materialmangel, Korruption und Bauqualität wirken auf Dauer, Region und beteiligte Gruppen.'},
+ private:{title:'Eine Dynastie wird über Jahre geformt',text:'Familie und Freunde verfolgen eigene Hoffnungen. Legt zusätzlich Erziehung und Lehrmeister fest: Fortschritt, Begabung und Erlebnisse prägen den späteren Herrscher.'},
  chronicle:{title:'Die Chronik erklärt Ursachen statt nur Ergebnisse',text:'Filtert nach Thema. Unter Einträgen wird sichtbar, aus welchem früheren Versprechen, Konflikt oder Erlass sie entstanden sind.'}
 };

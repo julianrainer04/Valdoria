@@ -13,7 +13,9 @@ const dataFiles = [
   'data/petitions.js',
   'data/emergent.js',
   'data/private-incidents.js',
-  'data/living-history.js'
+  'data/living-history.js',
+  'data/deep-strategy.js',
+  'data/deep-systems.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
