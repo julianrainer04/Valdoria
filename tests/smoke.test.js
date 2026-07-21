@@ -102,5 +102,8 @@ assert.equal(migrated.regions.caerhaven.name, 'Caerhaven', 'Fehlende Regionsdate
 
 assert.match(gameSource, /escapeHtml\(h\.raw\)/, 'Freie Befehle werden in der Historie nicht sicher maskiert');
 assert.doesNotMatch(gameSource, /n\.innerHTML=`<b>\$\{title\}/, 'Toast-Texte werden noch als ungeprüftes HTML eingesetzt');
+assert.match(gameSource, /REGION_RENDER_SHAPES/, 'Die Kartenpolygone werden nicht zu sauberen Grenzen geglättet');
+assert.match(gameSource, /assets\/map-painted-atlas-v2\.webp/, 'Der exakt ausgeschnittene Grenzatlas ist nicht eingebunden');
+assert.match(gameSource, /vector-territories/, 'Länderbild und interaktive Spielflächen sind nicht verbunden');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
