@@ -17,11 +17,15 @@ const html=context.__mapGuide.mapSvg();
 let svg=html.match(/<svg[\s\S]*<\/svg>/)?.[0];
 if(!svg)throw new Error('Vektorkarte konnte nicht gerendert werden');
 const maskMode=process.argv.includes('--mask');
+const regionArg=process.argv.find(arg=>arg.startsWith('--region='));
+const region=regionArg&&regionArg.slice('--region='.length);
 const guideStyle=`<style>
 .vector-ocean{fill:#9dbac0}.vector-ocean-pattern{opacity:.12}.vector-land{fill:#d6c48e;stroke:#2b2117;stroke-width:5;stroke-linejoin:round}.vector-land-texture{display:none}[data-territory="caerhaven"] .vector-land{fill:#315b7d}[data-territory="falkenkrone"] .vector-land{fill:#547a8f}[data-territory="nordhaven"] .vector-land{fill:#b9c7c3}[data-territory="ravengar"] .vector-land{fill:#c2a26a}[data-territory="eldoria"] .vector-land{fill:#9cab76}[data-territory="aurelia"] .vector-land{fill:#d0b56f}[data-territory="lysara"] .vector-land{fill:#a9beb1}[data-territory="islands"] .vector-land{fill:#91b2c1}.atlas-routes,.movement-layer,.rgn,.terrain,.sea-names,.sea-currents,.carto-compass,.atlas-fleet,.vector-map-frame{display:none}
 </style>`;
+const regionRule=region?`[data-territory]:not([data-territory="${region}"]){display:none}`:'';
 const maskStyle=`<style>
 .vector-ocean{fill:#000}.vector-ocean-pattern,.vector-land-texture,.atlas-routes,.movement-layer,.rgn,.terrain,.sea-names,.sea-currents,.carto-compass,.atlas-fleet,.vector-map-frame{display:none}.vector-territories{filter:none!important}.vector-land{fill:#fff!important;stroke:#fff;stroke-width:1}
+${regionRule}
 </style>`;
 const style=maskMode?maskStyle:guideStyle;
 svg=svg.replace(/(<svg[^>]*>)/,'$1'+style);

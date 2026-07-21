@@ -113,6 +113,7 @@ for (const feature of ['rememberDecision', 'regionIdentityPanel', 'characterDyna
   assert.match(gameSource, new RegExp(feature), `Neues Geschichtssystem fehlt: ${feature}`);
 }
 assert.match(gameSource, /--region-alpha/, 'Gemalte Länder und dynamische Kartenfarben werden nicht gemeinsam dargestellt');
-assert.match(read('style.css'), /assets\/map-painted-atlas\.webp/, 'Der gemalte Grenzatlas ist nicht als Kartenunterlage eingebunden');
+assert.match(gameSource, /REGION_RENDER_SHAPES/, 'Die groben Kartenpolygone werden nicht zu sauberen Grenzen geglättet');
+assert.match(read('style.css'), /assets\/map-painted-atlas-v2\.webp/, 'Der exakt ausgeschnittene Grenzatlas ist nicht als Kartenunterlage eingebunden');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
