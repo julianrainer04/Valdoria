@@ -16,7 +16,8 @@ const dataFiles = [
   'data/depth-systems.js',
   'data/grand-systems.js',
   'data/living-world.js',
-  'data/private-world.js'
+  'data/private-world.js',
+  'data/crown-depth.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
@@ -61,7 +62,7 @@ const assetReferences = new Set();
 for (const file of sourceFiles) {
   for (const match of read(file).matchAll(/assets\/[A-Za-z0-9._-]+/g)) assetReferences.add(match[0]);
 }
-assert.ok(assetReferences.size >= 40, 'Zu wenige Bildreferenzen gefunden');
+assert.ok(assetReferences.size >= 46, 'Zu wenige Bildreferenzen gefunden');
 for (const asset of assetReferences) {
   assert.ok(fs.existsSync(path.join(root, asset)), `Bild fehlt: ${asset}`);
   assert.ok(fs.statSync(path.join(root, asset)).size > 1000, `Bild ist leer oder beschädigt: ${asset}`);
@@ -127,5 +128,9 @@ assert.match(gameSource, /livingTurn\(\)/, 'Die lebendige Welt läuft beim Runde
 assert.match(gameSource, /livingTreatyPanel/, 'Klauselverträge sind nicht mit den Ländern verbunden');
 assert.match(gameSource, /privateWorldTurn\(\)/, 'Das vertiefte Privatleben läuft beim Rundenwechsel nicht mit');
 assert.match(gameSource, /privateWorldView/, 'Die offenen privaten Lebenswege fehlen im Privatbereich');
+assert.match(gameSource, /crownDepthTurn\(\)/, 'Die zehn verbundenen Tiefensysteme laufen beim Rundenwechsel nicht mit');
+assert.match(gameSource, /crownLawPanel/, 'Der freie Gesetzesbaukasten fehlt im Staatsrat');
+assert.match(gameSource, /crownExpeditionPanel/, 'Mehrjährige Expeditionen fehlen in der Diplomatie');
+assert.match(gameSource, /crownLegacyPanel/, 'Das mehrstimmige Vermächtnis fehlt in der Chronik');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);

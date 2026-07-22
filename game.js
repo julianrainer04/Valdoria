@@ -1273,7 +1273,7 @@ function endTurn(){
  if(state.private.stress>70){state.private.health-=3;state.stats.stability-=2;state.events.unshift({turn:state.turn,date:dateLabel(),title:'Ein erschöpfter König',text:'Die Überlastung wird am Hof sichtbar. Gesundheit und Vertrauen in die Regierung leiden.'})}else if(state.private.stress<30)state.private.health+=1;
  if(state.private.queen>82)state.factions.nobles+=1;if(state.private.heir>70)state.stats.legitimacy+=1;if(state.private.health<40)state.stats.legitimacy-=3;
  if(state.private.secret>=32){if(state.private.affair){let partner=AFFAIR_PARTNERS.find(x=>x.id===state.private.affair.id);state.private.reputation-=18;state.factions.nobles-=6;state.private.queen=Math.max(0,state.private.queen-20);state.private.secret=0;state.events.unshift({turn:state.turn,date:dateLabel(),title:'Die Affäre fliegt auf',text:`Die heimliche Verbindung zu ${partner?.name||'einer Unbekannten'} wird am Hof bekannt. Die Königin und der Adel reagieren erschüttert.`});if(!state.private.pastLoves)state.private.pastLoves=[];if(partner)state.private.pastLoves.push({name:partner.name,type:'affair-discovered',turn:state.turn});state.private.pastLoves=state.private.pastLoves.slice(-12);state.private.affair=null}else{state.private.reputation-=10;state.factions.nobles-=4;state.private.secret=0;state.events.unshift({turn:state.turn,date:dateLabel(),title:'Gerüchte aus dem Mitternachtssalon',text:'Indiskrete Worte erreichen den Hof. Das private Ansehen des Königs und die Zustimmung des Adels sinken.'})}}
- livingTurn();privateWorldTurn();advanceCalendar();state.private.actionPoints=3;state.private.used=[];state.councilHeard=[];state.financeUsed=[];
+ livingTurn();privateWorldTurn();crownDepthTurn();advanceCalendar();state.private.actionPoints=3;state.private.used=[];state.councilHeard=[];state.financeUsed=[];
  applyDelayed();activateConsequences();normalizeState();state.trends={legitimacy:state.stats.legitimacy-snap.legitimacy,stability:state.stats.stability-snap.stability,trade:state.stats.trade-snap.trade,navy:state.stats.navy-snap.navy};state.pendingScenario=pickScenario();state.pendingPrivateIncident=pickPrivateIncident();state.petitions=pickPetitions();
  state.emergent=pickEmergentIssue();
  if(!state.story.beat){state.story.beat=pickStoryBeat();if(state.story.beat)state.story.beatExpires=state.turn+3}
@@ -1297,35 +1297,37 @@ livingTreatyAction=function(code){let [name,mode,act,id]=code.split(':');if(mode
 const coreRegionCard=regionCard;
 regionCard=function(){let id=state.selected,m=COUNTRY_META[id],p=m&&state.countryPolicy?.[m.key];return coreRegionCard()+(m&&!p?.annexed?livingTreatyPanel(id):'')};
 const coreRealmView=realmView;
-realmView=function(){let marker='<div class="section-label"><span>DIE STRATEGISCHE KARTE',html=coreRealmView();return html.replace(marker,livingRealmPulse()+marker)+livingCivilPanel()};
+realmView=function(){let marker='<div class="section-label"><span>DIE STRATEGISCHE KARTE',html=coreRealmView();return html.replace(marker,livingRealmPulse()+marker)+crownSocietyPanel()+livingCivilPanel()};
 const coreFinancesView=financesView;
 financesView=function(){return coreFinancesView()+livingProductionPanel()};
 const coreCouncilView=councilView;
-councilView=function(){return coreCouncilView()+livingRelationshipPanel()+livingSocialPanel()};
+councilView=function(){return coreCouncilView()+crownHouseholdPanel()+crownLawPanel()+crownSecretsPanel()+livingRelationshipPanel()+livingSocialPanel()};
 const coreMilitaryView=militaryView;
 militaryView=function(){return coreMilitaryView()+(ensureLiving().civilWar?livingCivilPanel():'')};
 const coreDiplomacyView=diplomacyView;
-diplomacyView=function(){return coreDiplomacyView()+livingTreatiesOverview()+livingGenerationPanel()};
+diplomacyView=function(){return coreDiplomacyView()+crownRivalsPanel()+crownExpeditionPanel()+livingTreatiesOverview()+livingGenerationPanel()};
 const coreProjectsView=projectsView;
-projectsView=function(){return coreProjectsView()+livingEraPanel()};
+projectsView=function(){return coreProjectsView()+crownPalacePanel()+livingEraPanel()};
 const corePrivateView=privateView;
 const legacyAffairPanel=affairPanel,legacyEscapadePanel=escapadePanel;
 affairPanel=function(){return ''};escapadePanel=function(){return ''};
 const coreLivingCapitalPanel=livingCapitalPanel;
 livingCapitalPanel=function(){return coreLivingCapitalPanel().replaceAll('class="capital-node','class="capital-pin')};
-privateView=function(){let base=corePrivateView().replace(`${state.private.actionPoints} / 2`,`${state.private.actionPoints} / 3`),end=base.indexOf('</section>');if(end>=0)base=base.slice(0,end+10)+privateWorldView()+base.slice(end+10);return base+livingCapitalPanel()+livingJourneyPanel()+livingTraditionPanel()};
+privateView=function(){let base=corePrivateView().replace(`${state.private.actionPoints} / 2`,`${state.private.actionPoints} / 3`),end=base.indexOf('</section>');if(end>=0)base=base.slice(0,end+10)+privateWorldView()+base.slice(end+10);return base+crownFestivalPanel()+livingCapitalPanel()+livingJourneyPanel()+livingTraditionPanel()};
 const coreChronicleView=chronicleView;
-chronicleView=function(){return coreChronicleView()+livingChroniclePanel()};
+chronicleView=function(){return coreChronicleView()+crownMemoryPanel()+crownLegacyPanel()+livingChroniclePanel()};
 const coreRecordDecision=recordDecision;
-recordDecision=function(title,text,meta={}){coreRecordDecision(title,text,meta);livingRememberDecision(title,text,meta);privateWorldRememberDecision(title,text,meta)};
+recordDecision=function(title,text,meta={}){coreRecordDecision(title,text,meta);livingRememberDecision(title,text,meta);privateWorldRememberDecision(title,text,meta);crownDepthRememberDecision(title,text,meta)};
 const coreLifeAction=lifeAction;
 lifeAction=function(id){let before=state.decisions[0];coreLifeAction(id);let newest=state.decisions[0];if(newest&&newest!==before){livingRememberDecision(newest.title,newest.text,{kind:'private'});persist()}};
 const coreNormalizeState=normalizeState;
-normalizeState=function(){coreNormalizeState();livingNormalize(state);privateWorldNormalize(state)};
+normalizeState=function(){coreNormalizeState();livingNormalize(state);privateWorldNormalize(state);crownDepthNormalize(state)};
 const coreAttemptSuccession=attemptSuccession;
-attemptSuccession=function(){coreAttemptSuccession();livingSuccessionReset();privateWorldSuccessionReset()};
+attemptSuccession=function(){let legacy=crownLegacySnapshot();coreAttemptSuccession();livingSuccessionReset();privateWorldSuccessionReset();crownDepthSuccessionReset(legacy)};
 const coreBindView=bindView;
-bindView=function(){coreBindView();livingBindUI();privateWorldBindUI()};
+bindView=function(){coreBindView();livingBindUI();privateWorldBindUI();crownDepthBindUI()};
+const coreShowLegacy=showLegacy;
+showLegacy=function(){coreShowLegacy();let epi=document.querySelector('.epilogue'),snap=crownLegacySnapshot();if(!epi)return;let voices=Object.entries(snap.perspectives).map(([k,v])=>`<div><small>${{family:'FAMILIE',people:'VOLK',nobles:'ADEL',enemies:'FEINDE',historians:'CHRONISTEN'}[k]}</small><b>${v}</b><i><em style="width:${v}%"></em></i></div>`).join('');epi.querySelector('.epi-stats')?.insertAdjacentHTML('beforebegin',`<div class="epilogue-voices"><h3>FÜNF WAHRHEITEN ÜBER DIESE HERRSCHAFT</h3><div>${voices}</div></div>`)};
 
 document.addEventListener('click',e=>{let b=e.target.closest('[data-view]');if(b)setView(b.dataset.view)});
 $('#end-turn').onclick=endTurn;$('#save-button').onclick=showSaves;
