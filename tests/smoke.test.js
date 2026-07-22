@@ -15,7 +15,8 @@ const dataFiles = [
   'data/private-incidents.js',
   'data/depth-systems.js',
   'data/grand-systems.js',
-  'data/living-world.js'
+  'data/living-world.js',
+  'data/private-world.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
@@ -124,5 +125,7 @@ assert.match(gameSource, /grandSelectedProvincePanel/, 'Provinzkultur und Religi
 assert.match(gameSource, /advanceCalendar\(\)/, 'Der beschleunigte Kalender ist nicht mit dem Rundenwechsel verbunden');
 assert.match(gameSource, /livingTurn\(\)/, 'Die lebendige Welt läuft beim Rundenwechsel nicht mit');
 assert.match(gameSource, /livingTreatyPanel/, 'Klauselverträge sind nicht mit den Ländern verbunden');
+assert.match(gameSource, /privateWorldTurn\(\)/, 'Das vertiefte Privatleben läuft beim Rundenwechsel nicht mit');
+assert.match(gameSource, /privateWorldView/, 'Die offenen privaten Lebenswege fehlen im Privatbereich');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
