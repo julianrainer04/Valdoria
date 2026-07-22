@@ -17,7 +17,8 @@ const dataFiles = [
   'data/grand-systems.js',
   'data/living-world.js',
   'data/private-world.js',
-  'data/crown-depth.js'
+  'data/crown-depth.js',
+  'data/sovereign-systems.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
