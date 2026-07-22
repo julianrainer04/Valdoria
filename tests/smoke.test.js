@@ -14,7 +14,8 @@ const dataFiles = [
   'data/emergent.js',
   'data/private-incidents.js',
   'data/depth-systems.js',
-  'data/grand-systems.js'
+  'data/grand-systems.js',
+  'data/living-world.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
@@ -120,5 +121,8 @@ assert.match(gameSource, /goodsMarketPanel/, 'Die Warenwirtschaft fehlt im Finan
 assert.match(gameSource, /grandSystemsTurn\(\)/, 'Die großen Reichssysteme laufen beim Rundenwechsel nicht mit');
 assert.match(gameSource, /grandWarCouncilPanel/, 'Der interaktive Kriegsrat fehlt an der Front');
 assert.match(gameSource, /grandSelectedProvincePanel/, 'Provinzkultur und Religion sind nicht in die Karte eingebunden');
+assert.match(gameSource, /advanceCalendar\(\)/, 'Der beschleunigte Kalender ist nicht mit dem Rundenwechsel verbunden');
+assert.match(gameSource, /livingTurn\(\)/, 'Die lebendige Welt läuft beim Rundenwechsel nicht mit');
+assert.match(gameSource, /livingTreatyPanel/, 'Klauselverträge sind nicht mit den Ländern verbunden');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
