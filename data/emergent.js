@@ -49,5 +49,37 @@ const EMERGENT_TEMPLATES=[
  {id:'succession_rumor',category:'HAUS & NACHFOLGE',when:s=>s.life&&!s.life.regency,make:(s,c)=>({title:'Gerüchte über die Nachfolge',text:'Am Hof kursiert offen die Frage, wer im Falle Eures plötzlichen Todes das Reich führen würde. Manche Adlige nutzen die Unsicherheit bereits, um eigene Ansprüche vorzubereiten.',choices:[
   {label:'DIE NACHFOLGE ÖFFENTLICH KLÄREN',hint:'Legitimität +3 · Thronreife +5 · Adel −2',apply:x=>{x.stats.legitimacy+=3;x.private.heir+=5;x.factions.nobles-=2;nudge(x,{crown:3})}},
   {label:'DIE FRAGE BEWUSST OFFEN LASSEN',hint:'Adel +3 · Legitimität −2 · Spielraum bewahrt',apply:x=>{x.factions.nobles+=3;x.stats.legitimacy-=2}},
-  {label:'GERÜCHTE VERFOLGEN LASSEN',hint:'1 Mio. ₲ · Geheimdienst +3 · Adel −3',apply:x=>{x.reserve-=1000000;x.stats.intelligence+=3;x.factions.nobles-=3;nudge(x,{crown:4})}}]})}
+  {label:'GERÜCHTE VERFOLGEN LASSEN',hint:'1 Mio. ₲ · Geheimdienst +3 · Adel −3',apply:x=>{x.reserve-=1000000;x.stats.intelligence+=3;x.factions.nobles-=3;nudge(x,{crown:4})}}]})},
+ {id:'smuggling_network',category:'SCHATTENWIRTSCHAFT',when:s=>s.stats.intelligence<50,make:(s,c)=>({title:`Schmuggelpfade um ${c.region.name}`,text:`Die Schattenmeisterin meldet ein wachsendes Netz aus Schmugglern, das Zölle in ${c.region.name} umgeht. Ihre Beweise sind lückenhaft, ihr Verdacht deutlich.`,choices:[
+  {label:'RAZZIEN ANORDNEN',hint:'2 Mio. Militärfonds · Region Unruhe +4 · Zolleinnahmen +',apply:x=>{x.militaryFund-=2000000;c.region.unrest+=4;x.reserve+=1800000;nudge(x,{crown:3})}},
+  {label:'ZÖLLE STILLSCHWEIGEND SENKEN',hint:'Handel +2 · Schmuggel verliert Reiz · Einnahmen sinken',apply:x=>{x.stats.trade+=2;x.modifiers.guildTax=(x.modifiers.guildTax||0)-0.01;nudge(x,{coin:-2,commons:2})}},
+  {label:'INFORMANTEN KAUFEN',hint:'1 Mio. ₲ · Geheimdienst +3 · Region Loyalität +2',apply:x=>{x.reserve-=1000000;x.stats.intelligence+=3;c.region.loyalty+=2}}]})},
+ {id:'alliance_proposal',category:'HOF & BÜNDNIS',when:()=>true,make:(s,c)=>({title:`Ein Bündnisangebot aus ${c.target}`,text:`Gesandte aus ${c.target} bieten einen förmlichen Beistandspakt an — Schutz und Handel im Austausch für Verpflichtungen, die Valdoria im Ernstfall teuer zu stehen kommen könnten.`,choices:[
+  {label:'PAKT UNTERZEICHNEN',hint:`${c.target} +10 · Legitimität +1 · Verpflichtung im Kriegsfall`,apply:x=>{x.relations[c.target]+=10;x.stats.legitimacy+=1;nudge(x,{crown:3})}},
+  {label:'NUR HANDELSTEIL ANNEHMEN',hint:`${c.target} +4 · Handel +2 · keine Bindung`,apply:x=>{x.relations[c.target]+=4;x.stats.trade+=2}},
+  {label:'HÖFLICH VERTAGEN',hint:'Keine Bindung · Geheimdienst +1',apply:x=>{x.stats.intelligence+=1}}]})},
+ {id:'foreign_relief',category:'AUSLÄNDISCHE HILFE',when:s=>Object.values(s.regions).some(r=>r.wealth<50),make:(s,c)=>({title:`Hilfsangebot aus ${c.target}`,text:`Nach schlechten Ernten bietet der Hof von ${c.target} Getreide und Gold für ${c.region.name} an — eine Geste, die auch als Einflussnahme verstanden werden kann.`,choices:[
+  {label:'HILFE ANNEHMEN',hint:`Region Wohlstand +4 · ${c.target} +5 · Abhängigkeit`,apply:x=>{c.region.wealth+=4;x.relations[c.target]+=5;x.modifiers.aurelianDependence=(x.modifiers.aurelianDependence||0)+0.01}},
+  {label:'NUR GOLD, KEINE BEDINGUNGEN',hint:'1,5 Mio. ₲ · geringere Bindung',apply:x=>{x.reserve+=1500000;x.relations[c.target]+=2}},
+  {label:'DANKEND ABLEHNEN',hint:'Stolz gewahrt · Region bleibt unversorgt',apply:x=>{x.stats.legitimacy+=1;c.region.unrest+=2;nudge(x,{crown:2})}}]})},
+ {id:'artisan_rivalry',category:'HANDWERK & STOLZ',when:s=>s.factions.cities>50,make:(s,c)=>({title:`Zwei Meister, ein Auftrag in ${c.region.name}`,text:`Zwei rivalisierende Meisterhandwerker bewerben sich um einen prestigeträchtigen Kronauftrag in ${c.region.name}. Beide haben mächtige Fürsprecher.`,choices:[
+  {label:'DEM ÄLTEREN MEISTER GEBEN',hint:'Region Infrastruktur +3 · Adel +2',apply:x=>{c.region.infrastructure+=3;x.factions.nobles+=2}},
+  {label:'DEM JÜNGEREN MEISTER GEBEN',hint:'Städte +4 · Risiko eines Rückschlags',apply:x=>{x.factions.cities+=4;x.delayed.push({due:x.turn+2,title:'Der junge Meister liefert',text:'Das gewagte Werk übertrifft alle Erwartungen und macht seinen Schöpfer berühmt.',effects:{legitimacy:2}})}},
+  {label:'WETTSTREIT VOR DEM HOF',hint:'1 Mio. ₲ · beide zufrieden · Ansehen +2',apply:x=>{x.reserve-=1000000;x.private.reputation+=2;x.factions.cities+=1;x.factions.nobles+=1}}]})},
+ {id:'garrison_unrest',category:'MILITÄR & TREUE',when:s=>s.factions.officers<50,make:(s,c)=>({title:`Unmut in der Garnison von ${c.region.name}`,text:`Offiziere in ${c.region.name} murren über ausbleibenden Sold und fehlende Beförderungen. Ihre Treue ist nicht mehr selbstverständlich.`,choices:[
+  {label:'SOLD SOFORT NACHZAHLEN',hint:'2 Mio. ₲ · Offiziere +5 · Garnison +2',apply:x=>{x.reserve-=2000000;x.factions.officers+=5;c.region.garrison+=2}},
+  {label:'BEFÖRDERUNGEN AUSSPRECHEN',hint:'Offiziere +3 · keine Kosten · Adel −1',apply:x=>{x.factions.officers+=3;x.factions.nobles-=1}},
+  {label:'DISZIPLIN DURCHSETZEN',hint:'Offiziere −2 · Stabilität +2 · Garnison −1',apply:x=>{x.factions.officers-=2;x.stats.stability+=2;c.region.garrison-=1}}]})},
+ {id:'pilgrimage_route',category:'GLAUBE & REISE',when:()=>true,make:(s,c)=>({title:`Pilgerzüge durch ${c.region.name}`,text:`Hunderte Pilger wollen zu den Sieben Glocken durch ${c.region.name} ziehen. Die Bewohner fürchten Diebstahl und volle Straßen, der Klerus erwartet Segen.`,choices:[
+  {label:'SICHERES GELEIT STELLEN',hint:'1 Mio. ₲ · Region Loyalität +3 · Stabilität +1',apply:x=>{x.reserve-=1000000;c.region.loyalty+=3;x.stats.stability+=1}},
+  {label:'ROUTE UMLEITEN',hint:'Region Unruhe −2 · Klerus verstimmt',apply:x=>{c.region.unrest-=2;x.factions.nobles-=1}},
+  {label:'PILGERMAUT ERHEBEN',hint:'800.000 ₲ · Volk −2',apply:x=>{x.reserve+=800000;x.factions.people-=2}}]})},
+ {id:'court_rumor_mill',category:'HOF & GERÜCHTE',when:()=>true,make:(s,c)=>({title:'Gerüchte hinter vorgehaltener Hand',text:'Am Hof kursieren Geschichten über das Privatleben der Krone — teils wahr, teils erfunden, aber jeder scheint sie zu kennen.',choices:[
+  {label:'GERÜCHTE DEMENTIEREN',hint:'Ansehen +2 · Belastung +3',apply:x=>{x.private.reputation+=2;x.private.stress+=3}},
+  {label:'IGNORIEREN',hint:'Keine Kosten · Gerüchte wuchern weiter',apply:x=>{x.private.reputation-=1}},
+  {label:'QUELLE AUFSPÜREN LASSEN',hint:'800.000 ₲ · Geheimdienst +2',apply:x=>{x.reserve-=800000;x.stats.intelligence+=2;x.private.secret+=1}}]})},
+ {id:'tax_farmers',category:'STEUERPACHT',when:s=>s.reserve<15000000,make:(s,c)=>({title:`Steuerpächter bieten sich für ${c.region.name} an`,text:`Private Pächter bieten der Krone sofortiges Gold gegen das Recht, in ${c.region.name} selbst Steuern einzutreiben — ein schneller Gewinn, der oft in Willkür endet.`,choices:[
+  {label:'PACHT VERGEBEN',hint:'4 Mio. ₲ sofort · Region Unruhe +5',apply:x=>{x.reserve+=4000000;c.region.unrest+=5;x.factions.people-=2}},
+  {label:'BEGRENZT VERPACHTEN',hint:'2 Mio. ₲ · Region Unruhe +2',apply:x=>{x.reserve+=2000000;c.region.unrest+=2}},
+  {label:'ABLEHNEN',hint:'Kein Gold · Region Loyalität +2',apply:x=>{c.region.loyalty+=2}}]})}
 ];
