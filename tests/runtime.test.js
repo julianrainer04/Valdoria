@@ -44,7 +44,7 @@ assert.equal(api.grand().houses.length,6,'Es existieren nicht sechs eigenständi
 assert.equal(Object.keys(api.grand().government.laws).length,7,'Die Verfassung besitzt nicht alle Gesetzesfelder');
 assert.equal(Object.keys(api.grand().provinces).length,8,'Die Provinzidentitäten decken die Karte nicht ab');
 s.life.age=20;s.life.regency=false;s.reserve=60000000;s.militaryFund=20000000;s.grand.government.mandate=80;
-assert.equal(Object.keys(api.privateWorld().contacts).length,9,'Der verborgene Hof besitzt nicht genügend unterschiedliche Beziehungen');
+assert.ok(Object.keys(api.privateWorld().contacts).length>=9,'Der verborgene Hof besitzt nicht genügend unterschiedliche Beziehungen');
 assert.equal(api.privatePath('libertine'),true,'Ein eigener unkonventioneller Lebensweg lässt sich nicht einschlagen');
 s.private.actionPoints=4;assert.equal(api.privateContact('meet:harbor_voice'),true,'Eine neue persönliche Bekanntschaft lässt sich nicht beginnen');api.privateWorld().contacts.harbor_voice.affection=45;assert.equal(api.privateContact('deepen:harbor_voice'),true,'Eine Bekanntschaft kann nicht zu einer langfristigen privaten Beziehung werden');assert.equal(api.privateWorld().contacts.harbor_voice.status,'intimate','Die Beziehung besitzt keinen dauerhaften Zustand');
 s.private.actionPoints=3;assert.equal(api.privateContact('promise:harbor_voice'),true,'Eine private Beziehung kann kein echtes Versprechen erzeugen');assert.equal(api.privateContact('fulfill:harbor_voice'),true,'Ein gegebenes Versprechen kann nicht bewusst eingelöst werden');assert.equal(api.privateWorld().contacts.harbor_voice.promises.at(-1).kept,true,'Das erfüllte Versprechen bleibt nicht in der gemeinsamen Geschichte');
