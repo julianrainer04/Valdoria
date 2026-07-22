@@ -4,6 +4,7 @@
 :root { --bg:#07100f; --panel:#101a18; --panel2:#15211e; --gold:#d1ad64; --gold2:#f0d390; --ink:#e8e1d2; --muted:#8d9b94; --line:#2b3934; --green:#4f8b72; --red:#a65d58; --blue:#557f9f; --gold-bright:#e0bf72; --muted-2:#8b978f; --surface-1:#111b19; --surface-2:#0d1715; --border-bronze:#8a6d3d; --muted-3:#7f8c85; --gold-pale:#f0d487; --gold-warm:#ecca8a; --ink-pale:#f0dfba; --ink-2:#e6dcc7; --text-soft:#a9b4ae; --danger-strong:#9d241b; --muted-4:#8f9c94; --danger-deep:#8e291f; --gold-deep:#80643a; --border-bronze-dim:#6a5836;}
 * { box-sizing:border-box; }
 body { margin:0; background:radial-gradient(circle at 30% 10%,#152521 0,#07100f 42%); color:var(--ink); font-family:Inter,system-ui,sans-serif; min-width:1100px; min-height:100vh; }
+@media(max-width:1100px){body{min-width:0}}
 button,input { font:inherit; }
 button { color:inherit; cursor:pointer; }
 .topbar { height:78px; display:flex; align-items:center; border-bottom:1px solid #293630; background:rgba(7,14,13,.96); padding:0 28px; position:sticky; top:0; z-index:20; box-shadow:0 8px 30px #0005; }
@@ -543,3 +544,33 @@ body[data-weather="rain"]::after,body[data-weather="storm"]::after,body[data-wea
 .collapsible-group:hover>summary h2{color:var(--gold2)}
 .collapsible-body{padding:18px 16px;display:flex;flex-direction:column;gap:18px}
 .collapsible-body>*{margin-top:0}
+html,body{overflow-x:hidden;max-width:100vw}
+@media(max-width:600px){
+.crisis{grid-template-columns:1fr}
+.crisis .crisis-copy{padding:16px}
+}
+@media(max-width:640px){
+.topbar{height:auto;flex-wrap:wrap;padding:10px 12px;row-gap:8px;position:sticky}
+.brand{order:1;flex:1 1 auto;min-width:0}
+.brand span:last-child small{display:none}
+.top-actions{order:2;gap:6px;flex:0 0 auto}
+#main-nav{order:3;flex:1 1 100%;width:100%;display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:2px}
+#main-nav::-webkit-scrollbar{display:none}
+.nav-item{flex:0 0 auto;white-space:nowrap;padding:8px 12px;font-size:9px}
+.season{display:none}
+.icon-button{width:34px;height:34px;padding:0}
+.end-turn{height:34px;padding:0 12px;font-size:9px}
+.end-turn span{display:none}
+.stats-strip{flex-wrap:wrap}
+.stat{min-width:0;flex:1 1 calc(50% - 1px);padding:10px 12px}
+.map-controls{flex-wrap:wrap;right:14px;max-width:calc(100% - 28px)}
+.map-controls button{padding:6px 8px;font-size:8px}
+.private-actions{grid-template-columns:1fr}
+.age-progress{grid-template-columns:1fr}
+.historical-age{grid-template-columns:1fr}
+.command-dock{flex-wrap:wrap;height:auto;padding:10px 12px;row-gap:8px}
+.command-copy{display:none}
+#command-form{flex:1 1 100%;display:flex}
+#command-form input{min-width:0;flex:1}
+dialog{width:96vw;max-width:96vw}
+}
