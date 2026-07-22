@@ -13,7 +13,8 @@ const dataFiles = [
   'data/petitions.js',
   'data/emergent.js',
   'data/private-incidents.js',
-  'data/depth-systems.js'
+  'data/depth-systems.js',
+  'data/grand-systems.js'
 ];
 const scriptFiles = [...dataFiles, 'game.js'];
 
@@ -70,7 +71,7 @@ const gameSource = read('game.js');
 const saveStart = gameSource.indexOf('const SAVE_VERSION=');
 const saveEnd = gameSource.indexOf('let state=migrateState', saveStart);
 assert.ok(saveStart >= 0 && saveEnd > saveStart, 'Speicherlogik konnte nicht gefunden werden');
-const saveSource = read('data/depth-systems.js') + '\n' + gameSource.slice(saveStart, saveEnd) + '\n;globalThis.__saveApi={SAVE_VERSION,isCompatibleSave,migrateState};';
+const saveSource = read('data/depth-systems.js') + '\n' + read('data/grand-systems.js') + '\n' + gameSource.slice(saveStart, saveEnd) + '\n;globalThis.__saveApi={SAVE_VERSION,isCompatibleSave,migrateState};';
 const saveContext = {
   structuredClone,
   REGIONS: {
@@ -102,6 +103,9 @@ assert.equal(migrated.depth.court.length, 8, 'Der lebendige Hof wurde bei der Mi
 assert.equal(Object.keys(migrated.depth.world).length, 5, 'Autonome Nachbarreiche fehlen im migrierten Spielstand');
 assert.equal(Object.keys(migrated.depth.economy.goods).length, 7, 'Warenwirtschaft fehlt im migrierten Spielstand');
 assert.equal(Array.isArray(migrated.depth.innovation.unlocked), true, 'Forschungsfortschritt ist nicht speicherbar');
+assert.equal(migrated.grand.houses.length, 6, 'Rivalisierende Dynastien wurden bei der Migration nicht ergänzt');
+assert.equal(Object.keys(migrated.grand.government.laws).length, 7, 'Verfassung und Reichsgesetze fehlen im Spielstand');
+assert.equal(Object.keys(migrated.grand.provinces).length, 8, 'Kultur-, Glaubens- und Ausbauwerte der Provinzen fehlen');
 assert.equal(migrated.regions.caerhaven.loyalty, 44, 'Regionenfortschritt ging bei der Migration verloren');
 assert.equal(migrated.regions.caerhaven.name, 'Caerhaven', 'Fehlende Regionsdaten wurden nicht ergänzt');
 
@@ -113,5 +117,8 @@ assert.match(gameSource, /vector-territories/, 'Länderbild und interaktive Spie
 assert.match(gameSource, /depthSystemsTurn\(\)/, 'Die tiefen Systeme laufen beim Rundenwechsel nicht mit');
 assert.match(gameSource, /warLogisticsPanel/, 'Kriegslogistik ist nicht in die Länderkarte eingebunden');
 assert.match(gameSource, /goodsMarketPanel/, 'Die Warenwirtschaft fehlt im Finanzbereich');
+assert.match(gameSource, /grandSystemsTurn\(\)/, 'Die großen Reichssysteme laufen beim Rundenwechsel nicht mit');
+assert.match(gameSource, /grandWarCouncilPanel/, 'Der interaktive Kriegsrat fehlt an der Front');
+assert.match(gameSource, /grandSelectedProvincePanel/, 'Provinzkultur und Religion sind nicht in die Karte eingebunden');
 
 console.log(`Valdoria geprüft: ${scriptFiles.length} Skripte, ${assetReferences.size} Bilder und kompatible Speicherstände bis Version ${SAVE_VERSION}.`);
